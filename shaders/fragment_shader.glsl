@@ -15,7 +15,7 @@ uniform int shadingMode; // 0 for Gouraud, 1 for Phong
 void main() {
     if (shadingMode == 0) {
         // Gouraud shading: use interpolated color
-        FragColor = vec4(GouraudColor, 1.0);
+        FragColor = vec4(GouraudColor, 1.0); // 使用顶点着色器计算的颜色
     } else {
         // Phong shading: calculate lighting in the fragment shader
         vec3 norm = normalize(Normal);
@@ -26,10 +26,10 @@ void main() {
         vec3 reflectDir = reflect(-lightDir, norm);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-        vec3 ambient = vec3(0.2) * objectColor;
-        vec3 diffuse = lightColor * diff * objectColor;
-        vec3 specular = lightColor * spec;
+        vec3 ambient = vec3(0.1) * objectColor; // 环境光
+        vec3 diffuse = lightColor * diff * objectColor; // 漫反射
+        vec3 specular = lightColor * spec; // 高光
 
-        FragColor = vec4(ambient + diffuse + specular, 1.0);
+        FragColor = vec4(ambient + diffuse + specular, 1.0); // 最终颜色
     }
 }

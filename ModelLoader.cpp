@@ -22,14 +22,24 @@ void ModelLoader::loadModel(const std::string& path) {
         return;
     }
 
+    mesh.request_face_normals();
+    mesh.request_vertex_normals();
+    mesh.update_normals();
+
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
 
     for (const auto& vertex : mesh.vertices()) {
         auto point = mesh.point(vertex);
+        auto normal = mesh.normal(vertex);
+
         vertices.push_back(point[0]);
         vertices.push_back(point[1]);
         vertices.push_back(point[2]);
+
+        vertices.push_back(normal[0]);
+        vertices.push_back(normal[1]);
+        vertices.push_back(normal[2]);
     }
 
     for (const auto& face : mesh.faces()) {
@@ -52,13 +62,15 @@ void ModelLoader::loadModel(const std::string& path) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    // Enable vertex attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
-    // Check for OpenGL errors
+    // 检查 OpenGL 错误
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         std::cerr << "OpenGL Error: " << error << std::endl;

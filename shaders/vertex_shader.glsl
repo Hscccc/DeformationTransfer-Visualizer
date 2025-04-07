@@ -33,9 +33,9 @@ void main() {
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    vec3 ambient = vec3(0.2) * objectColor;
-    vec3 diffuse = lightColor * diff * objectColor;
-    vec3 specular = lightColor * spec;
+    vec3 ambient = vec3(0.2) * objectColor; // 环境光
+    vec3 diffuse = lightColor * diff * objectColor; // 漫反射
+    vec3 specular = lightColor * spec; // 高光
 
-    GouraudColor = ambient + diffuse + specular; // Final color for Gouraud shading
+    GouraudColor = ambient + diffuse + specular; // 将光照结果传递给片段着色器
 }

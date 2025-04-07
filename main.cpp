@@ -67,7 +67,7 @@ int main() {
 
     // Set light and view positions
     shader.use();
-    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightPos"), -0.08f, -3.56f, -7.01f);
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightPos"), 1.0f, -2.0f, 3.0f);
     glUniform3f(glGetUniformLocation(shader.getProgram(), "viewPos"), 0.0f, 1.0f, 3.0f);
     glUniform3f(glGetUniformLocation(shader.getProgram(), "lightColor"), 1.0f, 1.0f, 1.0f);
 
@@ -84,7 +84,7 @@ int main() {
     float rotationAngle = 0.0f;
 
     // Initialize light position
-    glm::vec3 lightPos(-0.08f, -3.56f, -7.01f);
+    glm::vec3 lightPos( 1.0f, -2.0f, 3.0f);
 
     // Rendering loop
     while (!glfwWindowShouldClose(window)) {
