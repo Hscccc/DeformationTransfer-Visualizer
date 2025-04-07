@@ -17,6 +17,18 @@ Deformation Transfer Visualizer 是一个基于 OpenGL 的 3D 可视化工具，
 
 ---
 
+## 运行效果
+可视化 `t1.obj` 文件
+- Gouraud
+
+![Gouraud](img/Gouraud.png)
+
+- Phong
+  
+![Phong](img/Phong.png)
+
+---
+
 ## 环境依赖
 - **操作系统**：macOS
 - **开发工具**：C++17
