@@ -9,7 +9,7 @@
 
 // Function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& shadingMode);
+void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& shadingMode, glm::vec3& lightPos);
 
 int main() {
     // Initialize GLFW
@@ -43,20 +43,17 @@ int main() {
         return -1;
     }
 
-    // Enable depth test
     glEnable(GL_DEPTH_TEST);
-
-    // Set clear color (背景颜色)
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 
     // Load model
     ModelLoader model;
-    model.loadModel("t1.obj"); // Changed to relative path
+    model.loadModel("t1.obj");
 
     // Load shaders
     Shader shader(
-        "shaders/vertex_shader.glsl", // Changed to relative path
-        "shaders/fragment_shader.glsl" // Changed to relative path
+        "shaders/vertex_shader.glsl",
+        "shaders/fragment_shader.glsl"
     );
 
     // Set up transformation matrices
@@ -70,28 +67,38 @@ int main() {
 
     // Set light and view positions
     shader.use();
-    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightPos"), 2.0f, 2.0f, 2.0f); // 光源位置
-    glUniform3f(glGetUniformLocation(shader.getProgram(), "viewPos"), 0.0f, 1.0f, 3.0f);  // 观察者位置
-    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightColor"), 1.0f, 1.0f, 1.0f); // 光源颜色
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightPos"), -0.08f, -3.56f, -7.01f);
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "viewPos"), 0.0f, 1.0f, 3.0f);
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightColor"), 1.0f, 1.0f, 1.0f);
 
     // Set shading mode (0 for Gouraud, 1 for Phong)
-    int shadingMode = 1; // Default to Phong
+    int shadingMode = 1;
     glUniform1i(glGetUniformLocation(shader.getProgram(), "shadingMode"), shadingMode);
+
+    // Set object color to orange
+    shader.use();
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "objectColor"), 1.0f, 0.5f, 0.0f);
 
     // Initial scale factor and rotation angle
     float scale = 1.0f;
     float rotationAngle = 0.0f;
 
+    // Initialize light position
+    glm::vec3 lightPos(-0.08f, -3.56f, -7.01f);
+
     // Rendering loop
     while (!glfwWindowShouldClose(window)) {
         // Process input
-        processInput(window, scale, rotationAngle, shadingMode);
+        processInput(window, scale, rotationAngle, shadingMode, lightPos);
 
         // Clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Use shader program
         shader.use();
+
+        // Update light position
+        glUniform3f(glGetUniformLocation(shader.getProgram(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
         // Update model matrix with scaling and rotation
         glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -122,20 +129,25 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& shadingMode) {
+void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& shadingMode, glm::vec3& lightPos) {
+    // Sale
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        scale += 0.005f; // Increase scale
+        scale += 0.005f; 
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        scale -= 0.005f; // Decrease scale
-        if (scale < 0.01f) scale = 0.01f; // Prevent negative scale
+        scale -= 0.005f; 
+        if (scale < 0.01f) scale = 0.01f;
     }
+
+    // Rotate the model
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        rotationAngle -= 1.0f; // Rotate counterclockwise
+        rotationAngle -= 1.0f; 
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        rotationAngle += 1.0f; // Rotate clockwise
+        rotationAngle += 1.0f;
     }
+
+    // Change shading mode
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
         shadingMode = 0; // Gouraud
         std::cout << "Gouraud shading mode" << std::endl;
@@ -143,5 +155,31 @@ void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& s
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
         shadingMode = 1; // Phong
         std::cout << "Phong shading mode" << std::endl;
+    }
+
+    // Control light position
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        lightPos.y += 0.01f;
+        std::cout << "Light position: (" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << ")" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        lightPos.y -= 0.01f;
+        std::cout << "Light position: (" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << ")" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        lightPos.x -= 0.01f;
+        std::cout << "Light position: (" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << ")" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        lightPos.x += 0.01f;
+        std::cout << "Light position: (" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << ")" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        lightPos.z -= 0.01f;
+        std::cout << "Light position: (" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << ")" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        lightPos.z += 0.01f;
+        std::cout << "Light position: (" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << ")" << std::endl;
     }
 }

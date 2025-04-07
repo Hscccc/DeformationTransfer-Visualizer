@@ -14,6 +14,7 @@ uniform mat4 projection;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform vec3 lightColor;
+uniform vec3 objectColor;
 
 void main() {
     // Transform vertex position
@@ -32,8 +33,8 @@ void main() {
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    vec3 ambient = vec3(0.1);
-    vec3 diffuse = lightColor * diff;
+    vec3 ambient = vec3(0.2) * objectColor;
+    vec3 diffuse = lightColor * diff * objectColor;
     vec3 specular = lightColor * spec;
 
     GouraudColor = ambient + diffuse + specular; // Final color for Gouraud shading
