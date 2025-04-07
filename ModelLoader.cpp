@@ -70,7 +70,6 @@ void ModelLoader::loadModel(const std::string& path) {
 
     glBindVertexArray(0);
 
-    // 检查 OpenGL 错误
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         std::cerr << "OpenGL Error: " << error << std::endl;
