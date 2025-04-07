@@ -1,0 +1,42 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic libraries
+*.so
+*.dll
+*.dylib
+
+# Executable files
+*.exe
+*.out
+*.app
+
+# Build directories
+/build/
+bin/
+Debug/
+Release/
+
+# IDE specific files
+*.vcxproj*
+*.sln
+*.xcodeproj
+*.idea/
+*.vscode/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Generated files
+*.generated.*
+*.bak
+
+# OpenMesh cache
+*.om_cache
+
+# Ignore system files
+.DS_Store
+Thumbs.db
