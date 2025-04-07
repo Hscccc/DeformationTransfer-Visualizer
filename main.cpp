@@ -9,7 +9,7 @@
 
 // Function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window, float& scale, float& rotationAngle);
+void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& shadingMode);
 
 int main() {
     // Initialize GLFW
@@ -47,16 +47,16 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // Set clear color (背景颜色)
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Load model
     ModelLoader model;
-    model.loadModel("/Users/hscccccc/Desktop/2025_Spring/CG/DeformationTransfer-Visualizer/t1.obj");
+    model.loadModel("t1.obj"); // Changed to relative path
 
     // Load shaders
     Shader shader(
-        "/Users/hscccccc/Desktop/2025_Spring/CG/DeformationTransfer-Visualizer/shaders/vertex_shader.glsl",
-        "/Users/hscccccc/Desktop/2025_Spring/CG/DeformationTransfer-Visualizer/shaders/fragment_shader.glsl"
+        "shaders/vertex_shader.glsl", // Changed to relative path
+        "shaders/fragment_shader.glsl" // Changed to relative path
     );
 
     // Set up transformation matrices
@@ -68,6 +68,16 @@ int main() {
     GLuint viewLoc = glGetUniformLocation(shader.getProgram(), "view");
     GLuint projectionLoc = glGetUniformLocation(shader.getProgram(), "projection");
 
+    // Set light and view positions
+    shader.use();
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightPos"), 2.0f, 2.0f, 2.0f); // 光源位置
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "viewPos"), 0.0f, 1.0f, 3.0f);  // 观察者位置
+    glUniform3f(glGetUniformLocation(shader.getProgram(), "lightColor"), 1.0f, 1.0f, 1.0f); // 光源颜色
+
+    // Set shading mode (0 for Gouraud, 1 for Phong)
+    int shadingMode = 1; // Default to Phong
+    glUniform1i(glGetUniformLocation(shader.getProgram(), "shadingMode"), shadingMode);
+
     // Initial scale factor and rotation angle
     float scale = 1.0f;
     float rotationAngle = 0.0f;
@@ -75,7 +85,7 @@ int main() {
     // Rendering loop
     while (!glfwWindowShouldClose(window)) {
         // Process input
-        processInput(window, scale, rotationAngle);
+        processInput(window, scale, rotationAngle, shadingMode);
 
         // Clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -93,6 +103,9 @@ int main() {
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Toggle shading mode
+        glUniform1i(glGetUniformLocation(shader.getProgram(), "shadingMode"), shadingMode);
+
         // Render the model
         model.render();
 
@@ -109,7 +122,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window, float& scale, float& rotationAngle) {
+void processInput(GLFWwindow* window, float& scale, float& rotationAngle, int& shadingMode) {
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         scale += 0.005f; // Increase scale
     }
@@ -122,5 +135,13 @@ void processInput(GLFWwindow* window, float& scale, float& rotationAngle) {
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         rotationAngle += 1.0f; // Rotate clockwise
+    }
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+        shadingMode = 0; // Gouraud
+        std::cout << "Gouraud shading mode" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        shadingMode = 1; // Phong
+        std::cout << "Phong shading mode" << std::endl;
     }
 }
